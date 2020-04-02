@@ -21,3 +21,4 @@ license = "MIT OR Apache-2.0"
 repository = "https://nest.pijul.com/porky11/layer-system"
 
 [dependencies]
+arrayvec = "0.5.1"

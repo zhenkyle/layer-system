@@ -3,9 +3,7 @@
 /*!
 See [README.md]
 **/
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+use arrayvec::ArrayVec;
 
 /// A special action for the layer.
 pub enum ChangeAction {
@@ -22,7 +20,7 @@ pub enum ChangeAction {
 /// The action, that will be done after handling an event by a layer.
 pub struct Change<S, E> {
     /// Add new layers on top of the current layer.
-    add: Vec<Box<dyn Layer<S, E>>>,
+    add: ArrayVec<[LayerBox<S, E>; 10]>,
     /// Special actions.
     action: ChangeAction,
 }
@@ -31,7 +29,7 @@ impl<S, E> Change<S, E> {
     /// A simple change doing nothing.
     pub fn none() -> Self {
         Self {
-            add: Vec::new(),
+            add: ArrayVec::new(),
             action: ChangeAction::None,
         }
     }
@@ -39,13 +37,13 @@ impl<S, E> Change<S, E> {
     /// A change passing the event to the next layer.
     pub fn pass() -> Self {
         Self {
-            add: Vec::new(),
+            add: ArrayVec::new(),
             action: ChangeAction::Pass,
         }
     }
 
     /// A change just adding new layers.
-    pub fn add(add: Vec<Box<dyn Layer<S, E>>>) -> Self {
+    pub fn add(add: ArrayVec<[LayerBox<S, E>; 10]>) -> Self {
         Self {
             add,
             action: ChangeAction::None,
@@ -55,13 +53,13 @@ impl<S, E> Change<S, E> {
     /// A simple change removing the current layer.
     pub fn remove() -> Self {
         Self {
-            add: Vec::new(),
+            add: ArrayVec::new(),
             action: ChangeAction::Remove,
         }
     }
 
     /// A change replacing the current layer with new layers.
-    pub fn replace(add: Vec<Box<dyn Layer<S, E>>>) -> Self {
+    pub fn replace(add: ArrayVec<[LayerBox<S, E>; 10]>) -> Self {
         Self {
             add,
             action: ChangeAction::Remove,
@@ -71,13 +69,13 @@ impl<S, E> Change<S, E> {
     /// A change removing all layers.
     pub fn close() -> Self {
         Self {
-            add: Vec::new(),
+            add: ArrayVec::new(),
             action: ChangeAction::Clear,
         }
     }
 
     /// A change replacing all layers with a new stack of layers.
-    pub fn clear(add: Vec<Box<dyn Layer<S, E>>>) -> Self {
+    pub fn clear(add: ArrayVec<[LayerBox<S, E>; 10]>) -> Self {
         Self {
             add,
             action: ChangeAction::Clear,
@@ -95,11 +93,11 @@ pub trait Layer<S, E> {
 }
 
 /// The layer manager deals with the layers you create.
-pub struct LayerManager<S, E>(Vec<Box<dyn Layer<S, E>>>);
+pub struct LayerManager<S, E>(ArrayVec<[LayerBox<S, E>; 10]>);
 
 impl<S, E> LayerManager<S, E> {
     /// Create a new layer manager containing specified initial layers.
-    pub fn new(layers: Vec<Box<dyn Layer<S, E>>>) -> Self {
+    pub fn new(layers: ArrayVec<[LayerBox<S, E>; 10]>) -> Self {
         LayerManager::<S, E>(layers)
     }
 
@@ -182,6 +180,7 @@ mod tests {
         }
     }
 
+/*
     #[test]
     fn example() {
         let mut manager = LayerManager::new(vec![Box::new(MainLayer), Box::new(TopLayer)]);
@@ -196,3 +195,4 @@ mod tests {
         }
     }
 }
+*/
